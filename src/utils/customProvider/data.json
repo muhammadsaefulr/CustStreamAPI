@@ -1,0 +1,17 @@
+{
+  "repoName": "otakudesu",
+  "url": "https://otakudesu.cloud",
+  "repoContents": {
+    "getHomePage": {
+      "urlPaths": "/",
+      "elementsMainTag": ".venz li",
+      "contentsTag": {
+        "episode": ".epz"
+      }
+    },
+    "getEpisodesLists": {
+        "urlPaths": "/anime/"
+    },
+    "getVideoPlayContent": {}
+  }
+}

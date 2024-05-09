@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": "./src",
+    "paths": {
+      "@customProvider/*": ["./src/utils/customProvider/*"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+  }
+}
