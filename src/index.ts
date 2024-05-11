@@ -1,14 +1,18 @@
 import { Hono } from "hono";
-import WebScraper from "utils/scrapper/readCustomProvider";
+import movieRoutes from "routes/movieRoutes";
+import { HTTPException } from "hono/http-exception";
+import { logger } from "hono/logger";
+import { errorHandler } from "middleware/middleware";
 
 const app = new Hono();
 
-app.get("/", async (c) => {
-  const dataRes = await WebScraper.scrapeHomePage("https://otakudesu.cloud") 
-  return c.json({message: "Hello", data: dataRes}, 200);
-});
+app.onError(errorHandler)
+app.get("/", (c) => c.json({ message: "Service Is Up !" }, 200));
+app.route("/main", movieRoutes);
 
-export default { 
-  port: 3000, 
-  fetch: app.fetch, 
-} 
+app.use("*", logger());
+
+export default {
+  port: 5001,
+  fetch: app.fetch,
+};

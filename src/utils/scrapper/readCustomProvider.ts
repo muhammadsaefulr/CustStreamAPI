@@ -1,4 +1,4 @@
-import { load } from "cheerio";
+import { CheerioAPI, load } from "cheerio";
 
 class WebScraper {
   private static async fetchHtml(url: string): Promise<string> {
@@ -6,16 +6,16 @@ class WebScraper {
     return await response.text();
   }
 
-  static async scrapeHomePage(url: string): Promise<any[]> {
-    interface DataRes {
-      title: string;
-      url: string;
-      imageUrl: string;
-    }
-
+  private static async cheerioInstance(url: string): Promise<CheerioAPI> {
     const html = await this.fetchHtml(url);
-    const $ = load(html);
-    let datas: DataRes[] = [];
+    const datas = load(html);
+
+    return datas;
+  }
+
+  static async scrapeHomePage(url: string): Promise<DataTypesHomePage[]> {
+    const $ = await this.cheerioInstance(url);
+    let datas: DataTypesHomePage[] = [];
 
     $(".venz li").each((i, el) => {
       const anime = {
@@ -38,13 +38,13 @@ class WebScraper {
   }
 
   static async scrapeMovieEpisodes(url: string): Promise<any[]> {
-    const html = await this.fetchHtml(url);
-    const $ = load(html);
+    const $ = await this.cheerioInstance(url);
     let movie: any[] = [];
 
     $(".episodelist li").each((i, el) => {
       const movieList = {
         title: $(el).find("span a").text().trim(),
+        vidLinks: $(el).find("span a").attr("href"),
       };
 
       movie.push({ title: movieList.title });
@@ -52,7 +52,21 @@ class WebScraper {
 
     return movie;
   }
-}
 
+  static async scrapeVideoMovieSource(url: string): Promise<any[]> {
+    const $ = await this.cheerioInstance(url);
+    const movieSource: any[] = [];
+
+    $(".responsive-embed-stream").each((i, el) => {
+      const dataSource = {
+        vidSourceLinks: $("iframe").attr("src"),
+      };
+
+      movieSource.push({ sourceLinks: dataSource.vidSourceLinks });
+    });
+
+    return movieSource;
+  }
+}
 
 export default WebScraper;

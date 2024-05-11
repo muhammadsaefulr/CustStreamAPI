@@ -1,0 +1,3 @@
+interface movieReqBody {
+    url: string
+}
