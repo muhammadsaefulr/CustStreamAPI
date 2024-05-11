@@ -47,10 +47,29 @@ class WebScraper {
         vidLinks: $(el).find("span a").attr("href"),
       };
 
-      movie.push({ title: movieList.title });
+      movie.push({ title: movieList.title, vidSource: movieList.vidLinks });
     });
 
     return movie;
+  }
+
+  static async scrapeSearchMovieByTitle(url: string): Promise<any[]> {
+    const $ = await this.cheerioInstance(url);
+    const movieList: any[] = [];
+
+    $("ul.chivsrc li").each((i, el) => {
+      const resultList = {
+        title: $(el).find("h2 a").text(),
+        movieLinks: $(el).find("h2 a").attr("href"),
+      };
+
+      movieList.push({
+        title: resultList.title,
+        movieLinks: resultList.movieLinks,
+      });
+    });
+
+    return movieList;
   }
 
   static async scrapeVideoMovieSource(url: string): Promise<any[]> {

@@ -1,24 +1,41 @@
 import WebScraper from "utils/scrapper/readCustomProvider";
 
 class moviePageService {
-    static async getHomePageMovieList(url: string) {
+  private static isValidUrl(url: string) {
+    let urlFetch = "";
 
-        let urlFetch = ""
-
-        if(!url.includes("http://")){
-            urlFetch += "http://" + url 
-        } else if(!url.includes("https://")){
-            urlFetch += "https://" + url
-        }
-
-        console.log(urlFetch)
-
-        const data = await WebScraper.scrapeHomePage(urlFetch)
-
-        console.log("data in service: ",data)
-
-        return data
+    if (!/^https?:\/\//.test(url)) {
+      urlFetch = `http://${url}`;
+    } else {
+      urlFetch = url;
     }
+
+    return urlFetch;
+  }
+
+  static async getHomePageMovieList(url: string) {
+    const data = await WebScraper.scrapeHomePage(this.isValidUrl(url));
+
+    return data;
+  }
+
+  static async getMovieEpisodeLists(url: string){
+    const data = await WebScraper.scrapeMovieEpisodes(this.isValidUrl(url))
+
+    return data;
+  }
+
+  static async getMovieVideoPlay(url: string){
+    const data = await WebScraper.scrapeVideoMovieSource(this.isValidUrl(url))
+
+    return data
+  }
+
+  static async getSearchMovieList(url: string) {
+    const data = await WebScraper.scrapeSearchMovieByTitle(this.isValidUrl(url))
+
+    return data
+  }
 }
 
-export default moviePageService
+export default moviePageService;
