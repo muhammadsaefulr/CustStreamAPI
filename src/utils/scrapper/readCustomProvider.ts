@@ -1,6 +1,6 @@
 import { CheerioAPI, load } from "cheerio";
 
-class WebScraper {
+class WebScraperOtakudesu {
   private static async fetchHtml(url: string): Promise<string> {
     const response = await fetch(url);
     return await response.text();
@@ -58,14 +58,37 @@ class WebScraper {
     const movieList: any[] = [];
 
     $("ul.chivsrc li").each((i, el) => {
+      const genres: any[] = [];
+      $(el)
+        .find('.set b:contains("Genres")')
+        .parent()
+        .find("a")
+        .each((i, genre) => {
+          const data = {
+            titleGenre: $(genre).text(),
+            genreLinks: $(genre).attr("href"),
+          };
+          genres.push(data);
+        });
+
       const resultList = {
         title: $(el).find("h2 a").text(),
         movieLinks: $(el).find("h2 a").attr("href"),
+        movieThumbnail: $(el).find("img").attr("href"),
+        status: $(el)
+          .find(".set b:contains('Status')")
+          .parent()
+          .text()
+          .trimStart(),
+        rating: $(el).find(".set b:contains('Rating')").parent().text(),
       };
 
-      movieList.push({
+      movieList.push(...movieList, {
         title: resultList.title,
         movieLinks: resultList.movieLinks,
+        genre: genres,
+        status: resultList.status,
+        rating: resultList.rating,
       });
     });
 
@@ -88,4 +111,4 @@ class WebScraper {
   }
 }
 
-export default WebScraper;
+export default WebScraperOtakudesu;
