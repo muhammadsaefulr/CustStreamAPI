@@ -13,9 +13,9 @@ class WebScraperOtakudesu {
     return datas;
   }
 
-  static async scrapeHomePage(url: string): Promise<DataTypesHomePage[]> {
+  static async scrapeHomePage(url: string): Promise<any[]> {
     const $ = await this.cheerioInstance(url);
-    let datas: DataTypesHomePage[] = [];
+    let datas: any[] = [];
 
     $(".venz li").each((i, el) => {
       const anime = {
@@ -48,6 +48,14 @@ class WebScraperOtakudesu {
       };
 
       movie.push({ title: movieList.title, vidSource: movieList.vidLinks });
+    });
+
+    $(".sinopc").each((i, el) => {
+      const sinopsis = {
+        desc: $(el).find("p").text(),
+      };
+
+      movie.push({ sinopsis: sinopsis.desc });
     });
 
     return movie;

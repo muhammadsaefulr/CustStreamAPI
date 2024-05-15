@@ -2,7 +2,7 @@ import { Context, Next } from "hono";
 import { HTTPException } from "hono/http-exception";
 import moviePageServiceOd from "service/otakudesuProvider/moviePageService";
 
-class moviePageHandler {
+class otakudesuPageHandler {
   static getHomePageMovieList = async (c: Context) => {
     try {
 
@@ -28,7 +28,8 @@ class moviePageHandler {
   static getMovieEpisodeLists = async (c: Context) => {
     try {
 
-      const responseData = await moviePageServiceOd.getMovieEpisodeListsOd();
+      const url = c.req.query('url')
+      const responseData = await moviePageServiceOd.getMovieEpisodeListsOd(url!);
 
       if (!responseData) {
         return c.json({ message: "Data Tidak Ditemukan !" }, 404);
@@ -49,8 +50,8 @@ class moviePageHandler {
 
   static getMovieVideoPlay = async (c: Context) => {
     try {
-
-      const responseData = await moviePageServiceOd.getMovieVideoPlayOd();
+      const url = c.req.query('url')
+      const responseData = await moviePageServiceOd.getMovieVideoPlayOd(url!);
 
       if (!responseData) {
         return c.json({ message: "Data Tidak Ditemukan !" }, 404);
@@ -97,4 +98,4 @@ class moviePageHandler {
   };
 }
 
-export default moviePageHandler;
+export default otakudesuPageHandler;

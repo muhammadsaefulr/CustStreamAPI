@@ -1,4 +1,4 @@
-import WebScraperOtakudesu from "utils/scrapper/readCustomProvider";
+import WebScraperOtakudesu from "utils/scrapper/otakudesu/readCustomProvider";
 
 const mainUrl = "https://otakudesu.cloud"
 class moviePageServiceOd {
@@ -9,14 +9,14 @@ class moviePageServiceOd {
     return data;
   }
 
-  static async getMovieEpisodeListsOd(){
-    const data = await WebScraperOtakudesu.scrapeMovieEpisodes(mainUrl)
+  static async getMovieEpisodeListsOd(url: string){
+    const data = await WebScraperOtakudesu.scrapeMovieEpisodes(url)
 
     return data;
   }
 
-  static async getMovieVideoPlayOd(){
-    const data = await WebScraperOtakudesu.scrapeVideoMovieSource(mainUrl)
+  static async getMovieVideoPlayOd(url: string){
+    const data = await WebScraperOtakudesu.scrapeVideoMovieSource(url)
 
     return data
   }

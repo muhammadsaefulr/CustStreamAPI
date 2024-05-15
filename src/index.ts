@@ -13,6 +13,6 @@ app.route("/main", movieRoutes);
 app.use("*", logger());
 
 export default {
-  port: 3000,
+  port: 4000,
   fetch: app.fetch,
 };
