@@ -1,11 +1,9 @@
-import { Context, Next } from "hono";
-import { HTTPException } from "hono/http-exception";
+import { Context } from "hono";
 import moviePageServiceOd from "service/otakudesuProvider/moviePageService";
 
 class otakudesuPageHandler {
   static getHomePageMovieList = async (c: Context) => {
     try {
-
       const responseData = await moviePageServiceOd.getHomePageMovieListOd();
 
       if (!responseData) {
@@ -27,9 +25,10 @@ class otakudesuPageHandler {
 
   static getMovieEpisodeLists = async (c: Context) => {
     try {
-
-      const url = c.req.query('url')
-      const responseData = await moviePageServiceOd.getMovieEpisodeListsOd(url!);
+      const pathname = c.req.param("pathname");
+      const responseData = await moviePageServiceOd.getMovieEpisodeListsOd(
+        pathname
+      );
 
       if (!responseData) {
         return c.json({ message: "Data Tidak Ditemukan !" }, 404);
@@ -39,6 +38,7 @@ class otakudesuPageHandler {
         {
           status: 200,
           message: "Berhasil Mengambil Data !",
+          path: pathname,
           data: responseData,
         },
         200
@@ -50,8 +50,8 @@ class otakudesuPageHandler {
 
   static getMovieVideoPlay = async (c: Context) => {
     try {
-      const url = c.req.query('url')
-      const responseData = await moviePageServiceOd.getMovieVideoPlayOd(url!);
+      const { pathname } = c.req.param()
+      const responseData = await moviePageServiceOd.getMovieVideoPlayOd(pathname!);
 
       if (!responseData) {
         return c.json({ message: "Data Tidak Ditemukan !" }, 404);
@@ -78,7 +78,9 @@ class otakudesuPageHandler {
         return c.json({ message: "Please insert data on query ?q= !" }, 400);
       }
 
-      const responseData = await moviePageServiceOd.getSearchMovieListOd(dataQuery);
+      const responseData = await moviePageServiceOd.getSearchMovieListOd(
+        dataQuery
+      );
 
       if (!responseData) {
         return c.json({ message: "Data Tidak Ditemukan !" }, 404);

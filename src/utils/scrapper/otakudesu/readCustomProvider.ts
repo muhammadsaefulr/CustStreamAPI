@@ -1,20 +1,22 @@
 import { CheerioAPI, load } from "cheerio";
 
+
+const url = "https://otakudesu.cloud/"
 class WebScraperOtakudesu {
   private static async fetchHtml(url: string): Promise<string> {
     const response = await fetch(url);
     return await response.text();
   }
-
-  private static async cheerioInstance(url: string): Promise<CheerioAPI> {
-    const html = await this.fetchHtml(url);
+  
+  private static async cheerioInstance(pathUri: string): Promise<CheerioAPI> {
+    const html = await this.fetchHtml(url + pathUri);
     const datas = load(html);
 
     return datas;
   }
-
-  static async scrapeHomePage(url: string): Promise<any[]> {
-    const $ = await this.cheerioInstance(url);
+  
+  static async scrapeHomePage(): Promise<any[]> {
+    const $ = await this.cheerioInstance("");
     let datas: any[] = [];
 
     $(".venz li").each((i, el) => {
@@ -37,8 +39,8 @@ class WebScraperOtakudesu {
     return datas;
   }
 
-  static async scrapeMovieEpisodes(url: string): Promise<any[]> {
-    const $ = await this.cheerioInstance(url);
+  static async scrapeMovieEpisodes(pathUri: string): Promise<any[]> {
+    const $ = await this.cheerioInstance(pathUri);
     let movie: any[] = [];
 
     $(".episodelist li").each((i, el) => {
@@ -55,14 +57,14 @@ class WebScraperOtakudesu {
         desc: $(el).find("p").text(),
       };
 
-      movie.push({ sinopsis: sinopsis.desc });
+      movie.push({ sinopsis: sinopsis.desc, path: pathUri });
     });
 
     return movie;
   }
 
-  static async scrapeSearchMovieByTitle(url: string): Promise<any[]> {
-    const $ = await this.cheerioInstance(url);
+  static async scrapeSearchMovieByTitle(pathUri: string): Promise<any[]> {
+    const $ = await this.cheerioInstance(pathUri);
     const movieList: any[] = [];
 
     $("ul.chivsrc li").each((i, el) => {
@@ -103,11 +105,11 @@ class WebScraperOtakudesu {
     return movieList;
   }
 
-  static async scrapeVideoMovieSource(url: string): Promise<any[]> {
-    const $ = await this.cheerioInstance(url);
+  static async scrapeVideoMovieSource(pathUri: string): Promise<any[]> {
+    const $ = await this.cheerioInstance(pathUri);
     const movieSource: any[] = [];
 
-    $(".responsive-embed-stream").each((i, el) => {
+    $(".responsive-embed-stream").each(() => {
       const dataSource = {
         vidSourceLinks: $("iframe").attr("src"),
       };

@@ -1,28 +1,29 @@
 import WebScraperOtakudesu from "utils/scrapper/otakudesu/readCustomProvider";
 
-const mainUrl = "https://otakudesu.cloud"
 class moviePageServiceOd {
 
   static async getHomePageMovieListOd() {
-    const data = await WebScraperOtakudesu.scrapeHomePage(mainUrl);
+    const data = await WebScraperOtakudesu.scrapeHomePage();
 
     return data;
   }
 
-  static async getMovieEpisodeListsOd(url: string){
-    const data = await WebScraperOtakudesu.scrapeMovieEpisodes(url)
+  static async getMovieEpisodeListsOd(pathname: string){
+    const dataPath = `anime/${pathname}`
+    const data = await WebScraperOtakudesu.scrapeMovieEpisodes(dataPath)
 
     return data;
   }
 
-  static async getMovieVideoPlayOd(url: string){
-    const data = await WebScraperOtakudesu.scrapeVideoMovieSource(url)
+  static async getMovieVideoPlayOd(pathname: string){
+    const dataPath = `episode/${pathname}`
+    const data = await WebScraperOtakudesu.scrapeVideoMovieSource(dataPath)
 
     return data
   }
 
   static async getSearchMovieListOd(query: string) {
-    const dataQuery = mainUrl + `?s=${query}&post_type=anime`
+    const dataQuery = `?s=${query}&post_type=anime`
     const data = await WebScraperOtakudesu.scrapeSearchMovieByTitle(dataQuery)
 
     return data
