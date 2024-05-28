@@ -61,7 +61,7 @@ class otakudesuPageHandler {
         {
           status: 200,
           message: "Berhasil Mengambil Data !",
-          data: responseData,
+          responseData,
         },
         200
       );

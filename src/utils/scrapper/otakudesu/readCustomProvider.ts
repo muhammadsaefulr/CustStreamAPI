@@ -1,20 +1,19 @@
 import { CheerioAPI, load } from "cheerio";
 
-
-const url = "https://otakudesu.cloud/"
+const url = "https://otakudesu.cloud/";
 class WebScraperOtakudesu {
   private static async fetchHtml(url: string): Promise<string> {
     const response = await fetch(url);
     return await response.text();
   }
-  
+
   private static async cheerioInstance(pathUri: string): Promise<CheerioAPI> {
     const html = await this.fetchHtml(url + pathUri);
     const datas = load(html);
 
     return datas;
   }
-  
+
   static async scrapeHomePage(): Promise<any[]> {
     const $ = await this.cheerioInstance("");
     let datas: any[] = [];
@@ -32,7 +31,9 @@ class WebScraperOtakudesu {
       datas.push({
         title: anime.title,
         url: anime.url,
-        imageUrl: anime.imageUrl,
+        thumbnailUrl: anime.imageUrl,
+        latestEp: anime.episode,
+        updateAnime: anime.dayUpdate + ", " + anime.dateUpdate,
       });
     });
 
@@ -43,6 +44,65 @@ class WebScraperOtakudesu {
     const $ = await this.cheerioInstance(pathUri);
     let movie: any[] = [];
 
+    $(".infozingle").each((i, el) => {
+      const dataInfo: any[] = [];
+      let sinopsisd = ""
+      let genres: any[] = [];
+
+      $(el)
+        .find('span b:contains("Genre")')
+        .parent()
+        .find("a")
+        .each((i, e) => {
+          const genre = {
+            genre: $(e).text(),
+            genreLinks: $(e).attr("href"),
+          };
+
+          genres.push(genre);
+        });
+
+        $(".sinopc").each((i, el) => {
+          const sinopsis = {
+            desc: $(el).find("p").text(),
+          };
+    
+          sinopsisd = sinopsis.desc
+        });
+
+      const dataDetails = {
+        title: $(el).find('p:contains("Judul")').text().replace("Judul: ", ""),
+        rating: $(el).find('p:contains("Skor")').text().replace("Skor: ", ""),
+        producer: $(el)
+          .find('p:contains("Produser")')
+          .text()
+          .replace("Produser: ", ""),
+        status: $(el)
+          .find('p:contains("Status")')
+          .text()
+          .replace("Status: ", ""),
+        totalEps: $(el)
+          .find('p:contains("Total Episode")')
+          .text()
+          .replace("Total Episode: ", ""),
+        duration: $(el)
+          .find('p:contains("Durasi")')
+          .text()
+          .replace("Durasi: ", "")
+          .replace("per ep.", ""),
+        studio: $(el)
+          .find('p:contains("Studio")')
+          .text()
+          .replace("Studio: ", ""),
+        genre: genres,
+        sinopsis: sinopsisd
+      };
+
+      dataInfo.push(dataDetails);
+
+      movie.push({ dataInfo });
+    });
+
     $(".episodelist li").each((i, el) => {
       const movieList = {
         title: $(el).find("span a").text().trim(),
@@ -50,14 +110,6 @@ class WebScraperOtakudesu {
       };
 
       movie.push({ title: movieList.title, vidSource: movieList.vidLinks });
-    });
-
-    $(".sinopc").each((i, el) => {
-      const sinopsis = {
-        desc: $(el).find("p").text(),
-      };
-
-      movie.push({ sinopsis: sinopsis.desc, path: pathUri });
     });
 
     return movie;
@@ -108,6 +160,28 @@ class WebScraperOtakudesu {
   static async scrapeVideoMovieSource(pathUri: string): Promise<any[]> {
     const $ = await this.cheerioInstance(pathUri);
     const movieSource: any[] = [];
+
+    $(".download ul").each((i, el) => {
+      $(el)
+        .find("li")
+        .each((i, el) => {
+          const dataList: any[] = [];
+          let title = $(el).find("strong").text();
+
+          dataList.push({ resVid: title });
+
+          $(el)
+            .find("a")
+            .each((i, el) => {
+              let title = $(el).text();
+              let links = $(el).attr("href");
+
+              dataList.push({ link: links, title: title });
+            });
+
+          movieSource.push({ videoRepo: dataList });
+        });
+    });
 
     $(".responsive-embed-stream").each(() => {
       const dataSource = {
