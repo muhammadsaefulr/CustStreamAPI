@@ -33,44 +33,57 @@ class WebScraperOtakudesu {
         url: anime.url,
         thumbnailUrl: anime.imageUrl,
         latestEp: anime.episode,
-        updateAnime: anime.dayUpdate + ", " + anime.dateUpdate,
+        updateAnime: anime.dayUpdate,
       });
     });
 
     return datas;
   }
 
-  static async scrapeMovieEpisodes(pathUri: string): Promise<any[]> {
+  static async scrapeGenreAnimes(pathUri: string) {
     const $ = await this.cheerioInstance(pathUri);
-    let movie: any[] = [];
+
+    let AnimeList: any[] = [];
+
+    $(".col-anime").each((i, el) => {
+      const dataAnime = {
+        animeTitle: $(el).find(".col-anime-title a").text().trim(),
+        animeLinks: $(el).find(".col-anime-title a").attr("href"),
+        animeStudio: $(el).find(".col-anime-studio").text().trim(),
+        animeEpsAvailable: $(el).find(".col-anime-eps").text().trim(),
+        animeRating: $(el).find(".col-anime-rating").text().trim(),
+      };
+
+      console.log(dataAnime)
+
+      AnimeList.push(dataAnime);
+    });
+
+    return AnimeList.slice(0, 20);
+  }
+
+  static async scrapeAnimeEpisodes(
+    pathUri: string
+  ): Promise<{ AnimeInfo: any[]; AnimeEps: any[] }> {
+    const $ = await this.cheerioInstance(pathUri);
+    let AnimeInfo: any[] = [];
+    let AnimeEps: any[] = [];
 
     $(".infozingle").each((i, el) => {
-      const dataInfo: any[] = [];
-      let sinopsisd = ""
-      let genres: any[] = [];
-
-      $(el)
+      const genres: any[] = $(el)
         .find('span b:contains("Genre")')
         .parent()
         .find("a")
-        .each((i, e) => {
-          const genre = {
-            genre: $(e).text(),
-            genreLinks: $(e).attr("href"),
-          };
+        .map((i, e) => ({
+          genre: $(e).text(),
+          genreLinks: $(e).attr("href"),
+        }))
+        .get();
 
-          genres.push(genre);
-        });
-
-        $(".sinopc").each((i, el) => {
-          const sinopsis = {
-            desc: $(el).find("p").text(),
-          };
-    
-          sinopsisd = sinopsis.desc
-        });
+      const sinopsis = $(".sinopc").find("p").text();
 
       const dataDetails = {
+        thumbnailImage: $(".fotoanime img").attr("src"),
         title: $(el).find('p:contains("Judul")').text().replace("Judul: ", ""),
         rating: $(el).find('p:contains("Skor")').text().replace("Skor: ", ""),
         producer: $(el)
@@ -91,33 +104,32 @@ class WebScraperOtakudesu {
           .replace("Durasi: ", "")
           .replace("per ep.", ""),
         studio: $(el)
-          .find('p:contains("Studio")')
+          .find('p:contains("Studio:")')
           .text()
           .replace("Studio: ", ""),
+        releaseDate: $(el).find('p:contains("Tanggal Rilis")').text(),
         genre: genres,
-        sinopsis: sinopsisd
+        sinopsis: sinopsis,
       };
 
-      dataInfo.push(dataDetails);
-
-      movie.push({ dataInfo });
+      AnimeInfo.push(dataDetails);
     });
 
     $(".episodelist li").each((i, el) => {
-      const movieList = {
+      const AnimeList = {
         title: $(el).find("span a").text().trim(),
         vidLinks: $(el).find("span a").attr("href"),
       };
 
-      movie.push({ title: movieList.title, vidSource: movieList.vidLinks });
+      AnimeEps.push(AnimeList);
     });
 
-    return movie;
+    return { AnimeInfo, AnimeEps };
   }
 
-  static async scrapeSearchMovieByTitle(pathUri: string): Promise<any[]> {
+  static async scrapeSearchAnimeByTitle(pathUri: string): Promise<any[]> {
     const $ = await this.cheerioInstance(pathUri);
-    const movieList: any[] = [];
+    const AnimeList: any[] = [];
 
     $("ul.chivsrc li").each((i, el) => {
       const genres: any[] = [];
@@ -135,8 +147,8 @@ class WebScraperOtakudesu {
 
       const resultList = {
         title: $(el).find("h2 a").text(),
-        movieLinks: $(el).find("h2 a").attr("href"),
-        movieThumbnail: $(el).find("img").attr("href"),
+        AnimeLinks: $(el).find("h2 a").attr("href"),
+        AnimeThumbnail: $(el).find("img").attr("href"),
         status: $(el)
           .find(".set b:contains('Status')")
           .parent()
@@ -145,30 +157,29 @@ class WebScraperOtakudesu {
         rating: $(el).find(".set b:contains('Rating')").parent().text(),
       };
 
-      movieList.push(...movieList, {
+      AnimeList.push(...AnimeList, {
         title: resultList.title,
-        movieLinks: resultList.movieLinks,
+        AnimeLinks: resultList.AnimeLinks,
         genre: genres,
         status: resultList.status,
         rating: resultList.rating,
       });
     });
 
-    return movieList;
+    return AnimeList.slice(0, 15);
   }
 
-  static async scrapeVideoMovieSource(pathUri: string): Promise<any[]> {
+  static async scrapeVideoAnimeSource(pathUri: string): Promise<any> {
     const $ = await this.cheerioInstance(pathUri);
-    const movieSource: any[] = [];
+    let data = {};
+    let AnimeSource: any[] = [];
 
     $(".download ul").each((i, el) => {
       $(el)
         .find("li")
         .each((i, el) => {
           const dataList: any[] = [];
-          let title = $(el).find("strong").text();
-
-          dataList.push({ resVid: title });
+          let titleRes = $(el).find("strong").text();
 
           $(el)
             .find("a")
@@ -176,10 +187,10 @@ class WebScraperOtakudesu {
               let title = $(el).text();
               let links = $(el).attr("href");
 
-              dataList.push({ link: links, title: title });
+              dataList.push({ title, links });
             });
 
-          movieSource.push({ videoRepo: dataList });
+          AnimeSource.push({ res: titleRes, dataList });
         });
     });
 
@@ -188,10 +199,10 @@ class WebScraperOtakudesu {
         vidSourceLinks: $("iframe").attr("src"),
       };
 
-      movieSource.push({ sourceLinks: dataSource.vidSourceLinks });
+      data = { sourceLinks: dataSource.vidSourceLinks, AnimeSource };
     });
 
-    return movieSource;
+    return data;
   }
 }
 

@@ -1,10 +1,10 @@
 import { Context } from "hono";
-import moviePageServiceOd from "service/otakudesuProvider/moviePageService";
+import AnimePageServiceOd from "service/otakudesuProvider/animePageService";
 
 class otakudesuPageHandler {
-  static getHomePageMovieList = async (c: Context) => {
+  static getHomePageAnimeList = async (c: Context) => {
     try {
-      const responseData = await moviePageServiceOd.getHomePageMovieListOd();
+      const responseData = await AnimePageServiceOd.getHomePageAnimeListOd();
 
       if (!responseData) {
         return c.json({ message: "Data Tidak Ditemukan !" }, 404);
@@ -23,10 +23,35 @@ class otakudesuPageHandler {
     }
   };
 
-  static getMovieEpisodeLists = async (c: Context) => {
+  static getAnimeGenre = async (c: Context) => {
+    try {
+      const { pathname } = c.req.param();
+
+      const responseData = await AnimePageServiceOd.getGenreAnimeListsOd(
+        pathname
+      );
+
+      if (!responseData) {
+        return c.json({ message: "Data Tidak Ditemukan !" }, 404);
+      }
+
+      return c.json(
+        {
+          status: 200,
+          message: "Berhasil mengambil data !",
+          data: responseData,
+        },
+        200
+      );
+    } catch (e) {
+      throw new Error(`${e}`);
+    }
+  };
+
+  static getAnimeEpisodeLists = async (c: Context) => {
     try {
       const pathname = c.req.param("pathname");
-      const responseData = await moviePageServiceOd.getMovieEpisodeListsOd(
+      const responseData = await AnimePageServiceOd.getAnimeEpisodeListsOd(
         pathname
       );
 
@@ -39,7 +64,10 @@ class otakudesuPageHandler {
           status: 200,
           message: "Berhasil Mengambil Data !",
           path: pathname,
-          data: responseData,
+          data: {
+            dataInfo: responseData.AnimeInfo,
+            dataEps: responseData.AnimeEps,
+          },
         },
         200
       );
@@ -48,10 +76,12 @@ class otakudesuPageHandler {
     }
   };
 
-  static getMovieVideoPlay = async (c: Context) => {
+  static getAnimeVideoPlay = async (c: Context) => {
     try {
-      const { pathname } = c.req.param()
-      const responseData = await moviePageServiceOd.getMovieVideoPlayOd(pathname!);
+      const { pathname } = c.req.param();
+      const responseData = await AnimePageServiceOd.getAnimeVideoPlayOd(
+        pathname!
+      );
 
       if (!responseData) {
         return c.json({ message: "Data Tidak Ditemukan !" }, 404);
@@ -70,7 +100,7 @@ class otakudesuPageHandler {
     }
   };
 
-  static getSearchMovies = async (c: Context) => {
+  static getSearchAnimes = async (c: Context) => {
     try {
       const dataQuery = c.req.query("q");
 
@@ -78,7 +108,7 @@ class otakudesuPageHandler {
         return c.json({ message: "Please insert data on query ?q= !" }, 400);
       }
 
-      const responseData = await moviePageServiceOd.getSearchMovieListOd(
+      const responseData = await AnimePageServiceOd.getSearchAnimeListOd(
         dataQuery
       );
 
