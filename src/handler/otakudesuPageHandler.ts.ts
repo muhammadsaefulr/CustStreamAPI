@@ -25,11 +25,9 @@ class otakudesuPageHandler {
 
   static getAnimeGenre = async (c: Context) => {
     try {
-      const { pathname } = c.req.param();
+      const { pathname, page } = c.req.param();
 
-      const responseData = await AnimePageServiceOd.getGenreAnimeListsOd(
-        pathname
-      );
+      const responseData = await AnimePageServiceOd.getGenreAnimeListsOd(pathname, page);
 
       if (!responseData) {
         return c.json({ message: "Data Tidak Ditemukan !" }, 404);

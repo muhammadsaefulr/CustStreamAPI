@@ -1,4 +1,7 @@
 import { CheerioAPI, load } from "cheerio";
+import mainService, {
+  pdrainExtractorServicePromise,
+} from "service/mainService/mainService";
 
 const url = "https://otakudesu.cloud/";
 class WebScraperOtakudesu {
@@ -53,9 +56,6 @@ class WebScraperOtakudesu {
         animeEpsAvailable: $(el).find(".col-anime-eps").text().trim(),
         animeRating: $(el).find(".col-anime-rating").text().trim(),
       };
-
-      console.log(dataAnime)
-
       AnimeList.push(dataAnime);
     });
 
@@ -174,34 +174,49 @@ class WebScraperOtakudesu {
     let data = {};
     let AnimeSource: any[] = [];
 
-    $(".download ul").each((i, el) => {
+    $(".download ul li").each((i, el) => {
+      const dataList: any[] = [];
+      let titleRes = $(el).find("strong").text();
       $(el)
-        .find("li")
+        .find("a")
         .each((i, el) => {
-          const dataList: any[] = [];
-          let titleRes = $(el).find("strong").text();
-
-          $(el)
-            .find("a")
-            .each((i, el) => {
-              let title = $(el).text();
-              let links = $(el).attr("href");
-
-              dataList.push({ title, links });
-            });
-
-          AnimeSource.push({ res: titleRes, dataList });
+          let title = $(el).text();
+          let links = $(el).attr("href");
+          dataList.push({ title, links });
         });
+      AnimeSource.push({ res: titleRes, dataList });
     });
 
-    $(".responsive-embed-stream").each(() => {
-      const dataSource = {
-        vidSourceLinks: $("iframe").attr("src"),
-      };
+    const dataSource = {
+      vidSourceLinks: $(".responsive-embed-stream iframe").attr("src"),
+    };
+    data = { sourceLinks: dataSource.vidSourceLinks, AnimeSource };
 
-      data = { sourceLinks: dataSource.vidSourceLinks, AnimeSource };
-    });
+    const pdrainSource = AnimeSource.filter((source) =>
+      source.res.toLowerCase().includes("mp4")
+    )
+      .map((source) => {
+        const filteredDataList = source.dataList.filter(
+          (item: any) => item.title.trim().toLowerCase() === "pdrain"
+        );
+        return filteredDataList.length > 0
+          ? { resolution: source.res, link: filteredDataList[0].links.trim() }
+          : null;
+      })
+      .filter((link) => link !== null);
 
+    const resultPdrain: any[] = [];
+    for (const datapdrain of pdrainSource) {
+      const result = await mainService.pdrainExtractorService(datapdrain.link);
+      if (result !== null) {
+        let res = datapdrain.resolution;
+        let links = result;
+
+        resultPdrain.push({ res, links });
+      }
+    }
+
+    data = { ...data, resultPdrain };
     return data;
   }
 }

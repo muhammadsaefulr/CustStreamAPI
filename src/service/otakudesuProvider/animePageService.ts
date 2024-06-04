@@ -8,8 +8,8 @@ class AnimePageServiceOd {
     return data;
   }
 
-  static async getGenreAnimeListsOd(pathname: string) {
-    const dataPath = `genres/${pathname}`
+  static async getGenreAnimeListsOd(pathname: string, page: string) {
+    const dataPath = `genres/${pathname}/page/${page}`
     const data = await WebScraperOtakudesu.scrapeGenreAnimes(dataPath)
 
     return data
