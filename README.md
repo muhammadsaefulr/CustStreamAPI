@@ -19,7 +19,18 @@ bun run dev
 ```
 /main/api/service/search?q=
 ```
+
 ### Get Anime Episode 
 ```
-/main/api/service/:judulanime
+/main/api/service/:animetitle
+```
+
+### Get Anime Genre
+```
+/main/api/service/otakudesu/genre/:genreAnime/:page
+```
+
+### Get Anime Stream Source
+```
+/main/api/service/otakudesu/play/:animeTitleWithEpisode
 ```
