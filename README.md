@@ -15,6 +15,59 @@ bun run dev
 /main/api/service
 ```
 
+<p>Example Output =></p>
+
+```json
+{
+    "status": 200,
+    "message": "Berhasil Mengambil Data !",
+    "data": [
+        {
+            "title": "Jiisan Baasan Wakagaeru",
+            "url": "https://otakudesu.cloud/anime/jiisan-baasan-sub-indo/",
+            "thumbnailUrl": "https://otakudesu.cloud/wp-content/uploads/2024/04/Jiisan-Baasan-Wakagaeru.jpg",
+            "latestEp": "Episode 10",
+            "updateAnime": "Senin"
+        },
+        {
+            "title": "Yoru no Kurage wa Oyogenai",
+            "url": "https://otakudesu.cloud/anime/yoru-kurage-oyogenai-sub-indo/",
+            "thumbnailUrl": "https://otakudesu.cloud/wp-content/uploads/2024/04/141827.jpg",
+            "latestEp": "Episode 10",
+            "updateAnime": "Minggu"
+        },
+        {
+            "title": "Blue Archive the Animation",
+            "url": "https://otakudesu.cloud/anime/blue-archive-sub-indo/",
+            "thumbnailUrl": "https://otakudesu.cloud/wp-content/uploads/2024/04/140995.jpg",
+            "latestEp": "Episode 10",
+            "updateAnime": "Senin"
+        },
+        {
+            "title": "Tensei Kizoku, Kantei Skill de Nariagaru",
+            "url": "https://otakudesu.cloud/anime/tensei-skill-nariagaru-sub-indo/",
+            "thumbnailUrl": "https://otakudesu.cloud/wp-content/uploads/2024/04/Tensei-Kizoku-Kantei-Skill-de-Nariagaru.jpg",
+            "latestEp": "Episode 10",
+            "updateAnime": "Senin"
+        },
+        {
+            "title": "Kimetsu no Yaiba: Hashira Geiko-hen",
+            "url": "https://otakudesu.cloud/anime/kimetsu-yaiba-s4-sub-indo/",
+            "thumbnailUrl": "https://otakudesu.cloud/wp-content/uploads/2024/05/Kimetsu-no-Yaiba-Hashira-Geiko-hen.jpg",
+            "latestEp": "Episode 5",
+            "updateAnime": "Senin"
+        },
+        {
+            "title": "Mushoku Tensei II: Isekai Ittara Honki Dasu Part 2",
+            "url": "https://otakudesu.cloud/anime/mushoku-tensi-s2-part-2-sub-indo/",
+            "thumbnailUrl": "https://otakudesu.cloud/wp-content/uploads/2024/04/Mushoku-Tensei-II-Isekai-Ittara-Honki-Dasu-Part-2.jpg",
+            "latestEp": "Episode 9",
+            "updateAnime": "Minggu"
+        }
+    ]
+}
+```
+
 ### Search Anime
 ```
 /main/api/service/search?q=
