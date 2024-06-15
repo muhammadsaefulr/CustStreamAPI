@@ -148,7 +148,7 @@ class WebScraperOtakudesu {
       const resultList = {
         title: $(el).find("h2 a").text(),
         AnimeLinks: $(el).find("h2 a").attr("href"),
-        AnimeThumbnail: $(el).find("img").attr("href"),
+        AnimeThumbnail: $(el).find("img").attr("src"),
         status: $(el)
           .find(".set b:contains('Status')")
           .parent()
@@ -159,6 +159,7 @@ class WebScraperOtakudesu {
 
       AnimeList.push(...AnimeList, {
         title: resultList.title,
+        thumbnailImage: resultList.AnimeThumbnail,
         AnimeLinks: resultList.AnimeLinks,
         genre: genres,
         status: resultList.status,
@@ -173,6 +174,16 @@ class WebScraperOtakudesu {
     const $ = await this.cheerioInstance(pathUri);
     let data = {};
     let AnimeSource: any[] = [];
+    let epsList: any[] = [];
+
+    $(".keyingpost li").each((i, el) => {
+      const data = {
+        title: $(el).find("a").text(),
+        links: $(el).find("a").attr("href"),
+      };
+
+      epsList.push(data);
+    });
 
     $(".download ul li").each((i, el) => {
       const dataList: any[] = [];
@@ -187,13 +198,32 @@ class WebScraperOtakudesu {
       AnimeSource.push({ res: titleRes, dataList });
     });
 
+    let partsSliced = $(".venutama")
+      .find("h1.posttl")
+      .text()
+      .split(/^(.*?)\s(Episode\s\d+\sSubtitle\sIndonesia)$/i);
+
     const dataSource = {
+      judulAnime: partsSliced[1],
+      epsNow: partsSliced[2],
+      nextEpsLinks: $(".flir").find("a:contains('Next Eps.')").attr("href"),
+      releaseOn: $(".kategoz")
+        .find("span:contains('Release on')")
+        .text()
+        .replace("Release on", ""),
       vidSourceLinks: $(".responsive-embed-stream iframe").attr("src"),
     };
-    data = { sourceLinks: dataSource.vidSourceLinks, AnimeSource };
+    data = {
+      title: dataSource.judulAnime,
+      releaseOn: dataSource.releaseOn,
+      epsNow: dataSource.epsNow,
+      sourceLinks: dataSource.vidSourceLinks,
+      nextEpsLinks: dataSource.nextEpsLinks,
+      AnimeSource,
+    };
 
     const pdrainSource = AnimeSource.filter((source) =>
-      source.res.toLowerCase().includes("mp4")
+      /(mp4|0p)/i.test(source.res.toLowerCase())
     )
       .map((source) => {
         const filteredDataList = source.dataList.filter(
@@ -216,7 +246,7 @@ class WebScraperOtakudesu {
       }
     }
 
-    data = { ...data, resultPdrain };
+    data = { ...data, epsList, resultPdrain };
     return data;
   }
 }

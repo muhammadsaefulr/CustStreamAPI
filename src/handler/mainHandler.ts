@@ -9,7 +9,7 @@ class mainHandler {
       return c.json({ message: "Query URL Is Null !" }, 404);
     }
 
-    const responseData = await mainService.pdrainExtractorServie(queryUrl);
+    const responseData = await mainService.pdrainExtractorService(queryUrl);
 
     if (!responseData) {
       return c.json({ message: "Data Not Found !" }, 404);
